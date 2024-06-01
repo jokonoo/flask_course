@@ -6,11 +6,21 @@ services:
     build:
       context: .
       dockerfile: docker_files/Dockerfile
-    command: flask --debug run --host 0.0.0.0 --port 8080
+    command: flask --app src run --host 0.0.0.0 --port 8080
     environment:
       - FLASK_APP=/flask_app/src/app
     volumes:
-      - ./src:/src
+      - ./src:/src/
     ports:
       - "8080:8080"
+  db:
+    image: postgres
+    restart: always
+    container_name: db
+    depends_on:
+    - api
+    environment:
+      POSTGRES_PASSWORD: admin
+      POSTGRES_USER: admin
+      POSTGRES_DB: movie_db
 
