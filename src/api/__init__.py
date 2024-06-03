@@ -3,7 +3,7 @@ from flask_restx import Api
 
 from .movies.movies import api as ns
 
-blueprint = Blueprint('movies', __name__)
+blueprint = Blueprint('api', __name__)
 
 
 api = Api(blueprint, title="API", description="Main routes.")
