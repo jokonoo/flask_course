@@ -1,0 +1,26 @@
+version: "3.8"
+
+services:
+  api:
+    container_name: flask_api
+    build:
+      context: .
+      dockerfile: docker_files/Dockerfile
+    command: flask run --host 0.0.0.0 --port 8080
+    environment:
+      - FLASK_APP=/flask_app/src
+    volumes:
+      - ./src:/src/
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+  db:
+    image: postgres
+    restart: always
+    container_name: db
+    environment:
+      POSTGRES_PASSWORD: admin
+      POSTGRES_USER: admin
+      POSTGRES_DB: movie_db
+
