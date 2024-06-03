@@ -22,5 +22,5 @@ services:
     environment:
       POSTGRES_PASSWORD: admin
       POSTGRES_USER: admin
-      POSTGRES_DB: movie_db
+      POSTGRES_DB: sw_db
 
