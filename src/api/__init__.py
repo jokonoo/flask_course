@@ -1,7 +1,7 @@
 from flask import Blueprint
 from flask_restx import Api
 
-from .movies.movies import api as ns
+from .movies.views import api as ns
 
 blueprint = Blueprint('api', __name__)
 
