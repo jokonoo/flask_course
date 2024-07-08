@@ -7,7 +7,7 @@ from .exceptions import NoResourceValue, WrongUrlResourceNotFound
 from .serializers import planet_fetcher_serializer
 from .route import api
 
-from database import db, get_or_create
+from database import get_or_create
 
 BASE_URL = "https://swapi.dev/api/"
 
@@ -46,7 +46,3 @@ def planet_page_data_parser(resource_type: str) -> None:
         data = data_request(url=next_page)
         planet_data_parser(data["results"])
         next_page = data.get("next")
-    # planets = (db.session.execute(db.select(PlanetModel)))
-    # for planet in planets:
-    #     print(planet)
-
