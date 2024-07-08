@@ -15,3 +15,9 @@ def get_or_create(model, **kwargs):
         db.session.add(model_object)
         db.session.commit()
         # TODO ADD LOGGER
+
+
+def get_first(model, **kwargs):
+    query = db.select(model).filter_by(**kwargs)
+    model_object = db.session.execute(query).first()
+    return model_object

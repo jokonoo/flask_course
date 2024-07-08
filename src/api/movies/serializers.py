@@ -6,7 +6,11 @@ character_serializer = api.model("Character", {
     "id": fields.Integer(readonly=True),
     "name": fields.String(required=True),
     "planet_id": fields.Integer(required=True),
+})
 
+character_fetcher_serializer = api.model("Character", {
+    "name": fields.String(required=True),
+    "planet_id": fields.Integer(required=True),
 })
 
 planet_serializer = api.model("Planet", {
@@ -24,5 +28,6 @@ planet_fetcher_serializer = api.model("Planet", {
     "population": fields.Integer(min=0),
     "terrain": fields.String(),
 })
+
 
 

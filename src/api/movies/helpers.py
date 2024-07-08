@@ -2,12 +2,12 @@ import requests
 from requests.exceptions import JSONDecodeError
 
 from flask_restx.fields import MarshallingError
-from .models import PlanetModel
+from .models import CharacterModel, PlanetModel
 from .exceptions import NoResourceValue, WrongUrlResourceNotFound
-from .serializers import planet_fetcher_serializer
+from .serializers import character_fetcher_serializer, planet_fetcher_serializer
 from .route import api
 
-from database import get_or_create
+from database import get_first, get_or_create
 
 BASE_URL = "https://swapi.dev/api/"
 
@@ -38,11 +38,29 @@ def planet_data_parser(data):
             pass
 
 
-def planet_page_data_parser(resource_type: str) -> None:
+def character_data_parser(data):
+    for character_object in data:
+        home_planet_name = data_request(url=character_object["homeworld"])["name"]
+        character_object_dict = {
+            "name": character_object.get("name"),
+            "planet_id": get_first(PlanetModel, name=home_planet_name)
+        }
+        try:
+            validated_data = api.marshal(character_object_dict, character_fetcher_serializer)
+            get_or_create(CharacterModel, **validated_data)
+        except MarshallingError:
+            pass
+
+
+def request_page_data_parser(resource_type: str) -> None:
     data = data_request(resource=resource_type)
     next_page = data.get("next")
-    planet_data_parser(data["results"])
+    if resource_type == "planets":
+        planet_data_parser(data["results"])
+    elif resource_type == "people":
+        character_data_parser(data["results"])
     while next_page:
         data = data_request(url=next_page)
         planet_data_parser(data["results"])
         next_page = data.get("next")
+
