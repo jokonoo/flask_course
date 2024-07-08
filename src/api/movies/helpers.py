@@ -23,6 +23,14 @@ def data_request(resource=None, url=None):
         raise WrongUrlResourceNotFound
 
 
+def data_parser(object_dict, object_model, object_serializer, **kwargs):
+    try:
+        validated_data = api.marshal(object_dict, object_serializer, **kwargs)
+        get_or_create(object_model, **validated_data)
+    except MarshallingError:
+        pass
+
+
 def planet_data_parser(data):
     for planet_object in data:
         planet_object_dict = {
@@ -31,11 +39,7 @@ def planet_data_parser(data):
             "population": planet_object.get("population") if planet_object.get("population") != "unknown" else None,
             "terrain": planet_object.get("terrain") if planet_object.get("terrain") != "unknown" else None
         }
-        try:
-            validated_data = api.marshal(planet_object_dict, planet_fetcher_serializer, skip_none=True)
-            get_or_create(PlanetModel, **validated_data)
-        except MarshallingError:
-            pass
+        data_parser(planet_object_dict, PlanetModel, planet_fetcher_serializer, skip_none=True)
 
 
 def character_data_parser(data):
@@ -43,24 +47,21 @@ def character_data_parser(data):
         home_planet_name = data_request(url=character_object["homeworld"])["name"]
         character_object_dict = {
             "name": character_object.get("name"),
-            "planet_id": get_first(PlanetModel, name=home_planet_name)
+            "planet_id": get_first(PlanetModel, name=home_planet_name).id
         }
-        try:
-            validated_data = api.marshal(character_object_dict, character_fetcher_serializer)
-            get_or_create(CharacterModel, **validated_data)
-        except MarshallingError:
-            pass
+        data_parser(character_object_dict, CharacterModel, character_fetcher_serializer)
 
 
 def request_page_data_parser(resource_type: str) -> None:
     data = data_request(resource=resource_type)
     next_page = data.get("next")
     if resource_type == "planets":
-        planet_data_parser(data["results"])
+        data_parser = planet_data_parser
     elif resource_type == "people":
-        character_data_parser(data["results"])
+        data_parser = character_data_parser
+    data_parser(data["results"])
     while next_page:
         data = data_request(url=next_page)
-        planet_data_parser(data["results"])
+        data_parser(data["results"])
         next_page = data.get("next")
 

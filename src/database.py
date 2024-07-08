@@ -6,7 +6,7 @@ db = SQLAlchemy()
 
 def get_or_create(model, **kwargs):
     query = db.select(model).filter_by(**kwargs)
-    model_object = db.session.execute(query).first()
+    model_object = db.session.scalars(query).first()
     if model_object:
         # TODO ADD LOGGER
         return model_object
@@ -19,5 +19,5 @@ def get_or_create(model, **kwargs):
 
 def get_first(model, **kwargs):
     query = db.select(model).filter_by(**kwargs)
-    model_object = db.session.execute(query).first()
+    model_object = db.session.scalars(query).first()
     return model_object
