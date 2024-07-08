@@ -1,8 +1,7 @@
-from flask_restx import Namespace, Resource
+from flask_restx import Resource
 
-from .helpers import data_request, planet_data_parser
-
-api = Namespace('movies', description='Movies related operations')
+from .route import api
+from .helpers import planet_page_data_parser
 
 
 @api.route("/test")
@@ -14,5 +13,4 @@ class Test(Resource):
 @api.route("/planet")
 class PlanetView(Resource):
     def post(self):
-        data = data_request("planets")
-        planet_data_parser(data)
+        planet_page_data_parser(resource_type="planets")

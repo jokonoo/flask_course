@@ -7,5 +7,4 @@ blueprint = Blueprint('api', __name__)
 
 
 api = Api(blueprint, title="API", description="Main routes.")
-
 api.add_namespace(ns)
