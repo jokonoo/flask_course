@@ -6,5 +6,5 @@ class WrongUrlResourceNotFound(Exception):
     pass
 
 
-class DataParserNotFound(Exception)
+class DataParserNotFound(Exception):
     pass
