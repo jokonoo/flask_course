@@ -4,3 +4,7 @@ class NoResourceValue(Exception):
 
 class WrongUrlResourceNotFound(Exception):
     pass
+
+
+class DataParserNotFound(Exception)
+    pass

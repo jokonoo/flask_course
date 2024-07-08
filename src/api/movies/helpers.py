@@ -3,7 +3,7 @@ from requests.exceptions import JSONDecodeError
 
 from flask_restx.fields import MarshallingError
 from .models import CharacterModel, PlanetModel
-from .exceptions import NoResourceValue, WrongUrlResourceNotFound
+from .exceptions import DataParserNotFound, NoResourceValue, WrongUrlResourceNotFound
 from .serializers import character_fetcher_serializer, planet_fetcher_serializer
 from .route import api
 
@@ -56,12 +56,14 @@ def request_page_data_parser(resource_type: str) -> None:
     data = data_request(resource=resource_type)
     next_page = data.get("next")
     if resource_type == "planets":
-        data_parser = planet_data_parser
+        data_type_parser = planet_data_parser
     elif resource_type == "people":
-        data_parser = character_data_parser
-    data_parser(data["results"])
+        data_type_parser = character_data_parser
+    else:
+        raise DataParserNotFound(
+            "Data parser for related resource type was not found, make sure that this resource type is supported")
+    data_type_parser(data["results"])
     while next_page:
         data = data_request(url=next_page)
-        data_parser(data["results"])
+        data_type_parser(data["results"])
         next_page = data.get("next")
-
