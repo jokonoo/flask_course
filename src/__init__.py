@@ -9,6 +9,7 @@ def create_app():
     app = Flask(__name__)
 
     app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://admin:admin@db/sw_db"
+    app.config["ERROR_404_HELP"] = False
 
     app.register_blueprint(api_blueprint, url_prefix='/api')
     db.init_app(app)
