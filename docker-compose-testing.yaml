@@ -9,21 +9,21 @@ services:
     environment:
       - FLASK_APP=/flask_app/src
       - POSTGRES_HOST=db
-      - POSTGRES_PASSWORD=admin
-      - POSTGRES_USER=admin
-      - POSTGRES_DB=sw_db
+      - POSTGRES_PASSWORD=test_admin
+      - POSTGRES_USER=test_admin
+      - POSTGRES_DB=test_sw_db
     volumes:
       - ./:/flask_app/
     ports:
       - "8080:8080"
     depends_on:
       - db
+    entrypoint: ./testing_entrypoint.sh
   db:
     image: postgres
     restart: always
     container_name: db
     environment:
-      POSTGRES_PASSWORD: admin
-      POSTGRES_USER: admin
-      POSTGRES_DB: sw_db
-
+      POSTGRES_PASSWORD: test_admin
+      POSTGRES_USER: test_admin
+      POSTGRES_DB: test_sw_db
