@@ -24,7 +24,7 @@ class PlanetView(Resource):
         planets_query = db.session.scalars(db.select(PlanetModel)).all()
         return planets_query
 
-    @api.expect(planet_fetcher_serializer)
+    @api.expect(planet_fetcher_serializer, validate=True)
     @api.marshal_with(planet_serializer)
     def post(self):
         planet, created = get_or_create(PlanetModel, **api.payload)
@@ -42,6 +42,11 @@ class PlanetView(Resource):
         if not planets_query:
             pass
         return planets_query
+
+    @api.expect()
+    @api.marshal_with(planet_serializer)
+    def put(self):
+        pass
 
 
 @api.route("/people/fetch")
@@ -62,7 +67,7 @@ class PeopleView(Resource):
         people_query = db.session.scalars(db.select(CharacterModel)).all()
         return people_query
 
-    @api.expect(character_fetcher_serializer)
+    @api.expect(character_fetcher_serializer, validate=True)
     @api.marshal_with(character_serializer)
     def post(self):
         planet_object = get_first(PlanetModel, id=api.payload["planet_id"])
