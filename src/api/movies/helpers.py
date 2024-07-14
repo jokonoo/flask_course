@@ -1,9 +1,11 @@
 import requests
 from requests.exceptions import JSONDecodeError
 
+from flask_restx import abort
 from flask_restx.fields import MarshallingError
+
 from .models import CharacterModel, PlanetModel
-from .exceptions import DataParserNotFound, NoResourceValue, WrongUrlResourceNotFound
+from .exceptions import DataParserNotFound, NoResourceValue, WrongUrlResourceNotFound, RESOURCE_DOES_NOT_EXIST_MESSAGE
 from .serializers import character_fetcher_serializer, planet_fetcher_serializer
 from .route import api
 
@@ -44,12 +46,18 @@ def planet_data_parser(data):
 
 def character_data_parser(data):
     for character_object in data:
-        home_planet_name = data_request(url=character_object["homeworld"])["name"]
-        character_object_dict = {
-            "name": character_object.get("name"),
-            "planet_id": get_first(PlanetModel, name=home_planet_name).id
-        }
-        data_parser(character_object_dict, CharacterModel, character_fetcher_serializer)
+        try:
+            home_planet_name = data_request(url=character_object["homeworld"])["name"]
+            related_planet_object = get_first(PlanetModel, name=home_planet_name)
+            if not related_planet_object:
+                raise NoResourceValue(f"Planet object with related name '{home_planet_name}' not found")
+            character_object_dict = {
+                "name": character_object.get("name"),
+                "planet_id": related_planet_object.id
+            }
+            data_parser(character_object_dict, CharacterModel, character_fetcher_serializer)
+        except NoResourceValue:
+            continue
 
 
 def request_page_data_parser(resource_type: str) -> None:
@@ -67,3 +75,10 @@ def request_page_data_parser(resource_type: str) -> None:
         data = data_request(url=next_page)
         data_type_parser(data["results"])
         next_page = data.get("next")
+
+
+def check_name_unique(model, attr_key, attr_value):
+    planet_name_exist = None
+    if attr_key == "name":
+        planet_name_exist = get_first(model, name=attr_value)
+    return True if planet_name_exist else False
