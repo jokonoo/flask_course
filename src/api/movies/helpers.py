@@ -1,7 +1,6 @@
 import requests
 from requests.exceptions import JSONDecodeError
 
-from flask_restx import abort
 from flask_restx.fields import MarshallingError
 
 from .models import CharacterModel, PlanetModel
