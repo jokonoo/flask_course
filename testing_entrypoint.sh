@@ -1,7 +1,6 @@
 #!/bin/bash
 
 sleep 5
-flask db upgrade
-pytest
+pytest -s
 
 tail -f /dev/null
