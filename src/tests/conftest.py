@@ -1,21 +1,13 @@
-import time
-
 import pytest
 from flask_migrate import upgrade
-from sqlalchemy import text
+from sqlalchemy import delete, text
 
 from database import db
 from src import create_app
 from src.api.movies.models import CharacterModel, PlanetModel
 
-planet_objects = [
-    PlanetModel(name=f"test_planet_{object_number}",
-                diameter=object_number*1000,
-                population=object_number*1000,
-                terrain="test_value") for object_number in range(10)]
 
-
-@pytest.fixture()
+@pytest.fixture(autouse=True, scope="session")
 def app():
     app = create_app()
     app.config.update(
@@ -38,15 +30,21 @@ def client(app):
 
 
 @pytest.fixture()
-def add_planets(app):
-    with app.app_context():
-        db.session.add_all(planet_objects)
-        db.session.commit()
-        return app
+def planets():
+    planet_models = [
+        PlanetModel(name=f"test_planet_{object_number}",
+                    diameter=object_number * 1000,
+                    population=object_number * 1000,
+                    terrain="test_value") for object_number in range(10)]
+    return planet_models
 
 
 @pytest.fixture()
-def planets(add_planets):
-    app_instance = add_planets
-    with app_instance.app_context():
-        return db.session.scalars(db.select(PlanetModel)).all()
+def add_planets(app, planets):
+    with app.app_context():
+        db.session.add_all(planets)
+        db.session.commit()
+        yield db.session.scalars(db.select(PlanetModel)).all()
+        db.session.execute(delete(PlanetModel))
+        db.session.commit()
+
