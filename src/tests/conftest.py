@@ -40,6 +40,14 @@ def planets():
 
 
 @pytest.fixture()
+def planets_dicts(planets):
+    planets_list = [{'id': index+1, 'name': planet_object.name, 'diameter': planet_object.diameter,
+                      'population': planet_object.population, 'terrain': planet_object.terrain,
+                      'residents': planet_object.residents} for index, planet_object in enumerate(planets)]
+    return planets_list
+
+
+@pytest.fixture()
 def add_planets(app, planets):
     with app.app_context():
         db.session.add_all(planets)
@@ -47,4 +55,3 @@ def add_planets(app, planets):
         yield db.session.scalars(db.select(PlanetModel)).all()
         db.session.execute(delete(PlanetModel))
         db.session.commit()
-

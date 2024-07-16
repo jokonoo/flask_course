@@ -18,9 +18,8 @@ class PlanetFetchView(Resource):
 
     @api.marshal_with(planet_serializer)
     def post(self):
-        request_page_data_parser(resource_type="planets")
-        planets_query = db.session.scalars(db.select(PlanetModel).order_by(PlanetModel.id)).all()
-        return planets_query
+        planet_results = request_page_data_parser(resource_type="planets")
+        return planet_results
 
 
 @api.route("/planet")
@@ -77,9 +76,8 @@ class PeopleFetchView(Resource):
 
     @api.marshal_with(character_serializer, as_list=True)
     def post(self):
-        request_page_data_parser(resource_type="people")
-        people_query = db.session.scalars(db.select(CharacterModel)).all()
-        return people_query
+        people_results = request_page_data_parser(resource_type="people")
+        return people_results
 
 
 @api.route("/people")
